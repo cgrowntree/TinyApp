@@ -14,15 +14,15 @@ function generateRandomString() {
   output += possible.charAt(Math.floor(Math.random() * possible.length));
 
   return output;
-}
+};
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-app.get("/", (req, res) => {
-  res.end("Hello!");
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -43,13 +43,16 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  shortURL = generateRandomString();
+  longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect('http://localhost:8080/urls/' + shortURL)
 });
 
 app.listen(PORT, () => {
