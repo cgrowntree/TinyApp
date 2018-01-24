@@ -5,11 +5,15 @@
     <% include partials/_header %>
   </head>
   <body>
-    <ul>
+    <table>
       <% Object.keys(urls).forEach(function(key) { %>
-        <li><%= key %> --> <%= urls[key] %><form method="POST" action="/urls/<%= key %>/delete"><button type='submit'>DELETE</button></form></li>
+        <tr>
+        <td><%= key %> → <%= urls[key] %></td>
+        <td><a href='/urls/<%= key %>'>Edit</a></td>
+          <td><form method="POST" action="/urls/<%= key %>/delete" style="display:inline-block"><button type='submit'>Delete 🗑 ️</button></form></td>
+        </tr>
       <% }); %>
-    </ul>
+      </table>
     <a href="/urls/new">Create new short URL here</a>
   </body>
 </html>

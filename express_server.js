@@ -53,6 +53,16 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect('/urls');
 });
 
+app.post("/urls/:id", (req, res) => {
+  let templateVars = {shortURL: req.params.id, longURL: req.body.longURL};
+  if (templateVars) {
+    urlDatabase[templateVars.shortURL] = templateVars.longURL;
+    res.redirect(`/urls/${req.params.id}`);
+  } else {
+    res.status(404).render('404');
+  }
+});
+
 app.post("/urls", (req, res) => {
   shortURL = generateRandomString();
   longURL = req.body.longURL;
