@@ -1,0 +1,19 @@
+<!-- views/urls_index.ejs -->
+<!DOCTYPE html>
+<header>
+    <% include partials/_header %>
+</header>
+
+<html lang="en">
+  <head>
+    <title>TinyApp</title>
+  </head>
+  <body>
+    <ul>
+      <% Object.keys(urls).forEach(function(key) { %>
+        <li><%= key %> - <%= urls[key] %></li>
+      <% }); %>
+    </ul>
+    <a href="#">Create new short URL here</a>
+  </body>
+</html>
