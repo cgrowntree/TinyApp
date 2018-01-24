@@ -33,6 +33,15 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+app.post("/urls", (req, res) => {
+  console.log(req.body);  // debug statement to see POST parameters
+  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
