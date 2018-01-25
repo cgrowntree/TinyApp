@@ -31,6 +31,15 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+app.post("/register", (req, res) => {
+  res.cookie();
+  res.redirect('/urls');
+});
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
