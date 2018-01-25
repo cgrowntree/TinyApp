@@ -3,8 +3,9 @@ var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
-
 app.set("view engine", "ejs");
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 function generateRandomString() {
   var output = "";
@@ -20,6 +21,11 @@ var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+app.use(function(req, res, next) {
+  res.locals.username = req.cookies["username"] || false;
+  next();
+});
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
@@ -46,6 +52,16 @@ app.get("/urls/:id", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
+});
+
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
 });
 
 app.post("/urls/:id/delete", (req, res) => {
