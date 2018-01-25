@@ -1,10 +1,15 @@
 <!-- views/partials/_header.ejs -->
 <header>
   <H1>Tiny App</H1>
+  <% if (username) { %>
+    <form action="/logout" method="POST" type="submit" value="Logout">
+      <span><%= username %></span>
+    <button>Logout</button>
+    </form>
+  <% } else{ %>
   <form action="/login" method="POST" style="padding:10px;">
     <input id="username" type="text" name="username" placeholder="username" style="width: 200px">
     <input type="submit" value="Submit">
-    <% if (username) { %>
-      <%= username %>
-    <% } %>
+    </form>
+  <% } %>
 </header>

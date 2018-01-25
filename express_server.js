@@ -22,6 +22,11 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+app.use(function(req, res, next) {
+  res.locals.username = req.cookies["username"] || false;
+  next();
+});
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -35,7 +40,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = {urls: urlDatabase, username: req.cookies["username"]};
+  let templateVars = {urls: urlDatabase};
   res.render("urls_index", templateVars);
 });
 
@@ -51,6 +56,11 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.post("/login", (req, res) => {
   res.cookie('username', req.body.username);
+  res.redirect('/urls');
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
   res.redirect('/urls');
 });
 
