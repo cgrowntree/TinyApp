@@ -22,6 +22,19 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = { 
+  "user1": {
+    id: "user1", 
+    email: "user1@euser.com", 
+    password: "user1"
+  },
+  "user2": {
+    id: "user2", 
+    email: "user2@user.com", 
+    password: "user2"
+  }
+}
+
 app.use(function(req, res, next) {
   res.locals.username = req.cookies["username"] || false;
   next();
@@ -36,7 +49,9 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  res.cookie();
+  userID = generateRandomString();
+  let users = {id: userID, email: req.body.email, password: req.body.password};
+  res.cookie('user_id', userID);
   res.redirect('/urls');
 });
 
