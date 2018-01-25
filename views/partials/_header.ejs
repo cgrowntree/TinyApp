@@ -4,4 +4,7 @@
   <form action="/login" method="POST" style="padding:10px;">
     <input id="username" type="text" name="username" placeholder="username" style="width: 200px">
     <input type="submit" value="Submit">
+    <% if (username) { %>
+      <%= username %>
+    <% } %>
 </header>
