@@ -101,8 +101,23 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res.cookie('user_id', req.body.user_id);
-  res.redirect('/urls');
+   let emailAndPwMatched = false;
+   let userID = '';
+   for (var user in users) {
+     if ((users[user].email === req.body.email) && (users[user].password === req.body.password)) {
+      emailAndPwMatched = true;
+      userID = users[user].id;
+      }
+    }
+   if (!checkExistingEmail(req.body.email)) {
+    res.status(403).render('400');
+    console.log('email doesnt exist')
+  } else if (emailAndPwMatched) {
+    res.cookie('user_id', userID);
+    res.redirect('/urls');
+  } else {
+    res.status(403).render('400');
+  }
 });
 
 app.post("/logout", (req, res) => {
