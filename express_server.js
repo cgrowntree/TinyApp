@@ -22,13 +22,55 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = { 
+  "user1": {
+    id: "user1", 
+    email: "user1@user.com", 
+    password: "user1"
+  },
+  "user2": {
+    id: "user2", 
+    email: "user2@user.com", 
+    password: "user2"
+  }
+}
+
+//Loop through each email in users and check if it is the same as givin email
+function checkExistingEmail(email) {
+  for (var userID in users) {
+    if (users[userID].email === email) return true;
+  }
+  return false;
+}
+
 app.use(function(req, res, next) {
-  res.locals.username = req.cookies["username"] || false;
+  res.locals.user_id = req.cookies["user_id"] || false;
   next();
 });
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
+});
+
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+app.post("/register", (req, res) => {
+  var userID = generateRandomString();
+  let userVars = {id: userID, email: req.body.email, password: req.body.password};
+  //if email or password is blank set and render 400 status
+  if (!userVars.email || !userVars.password) {
+    res.status(400).render('400');
+  //if email sent = email in db set and render 400 status
+  } else if (checkExistingEmail(req.body.email)) {
+    res.status(400).render('400'); // TODO: add res.cookie and set if cookie in register to display error
+  } else {
+    // insert userVars into database
+    users[userID] = userVars;
+    res.cookie('user_id', userID);
+    res.redirect('/urls');
+  }
 });
 
 app.get("/urls.json", (req, res) => {
@@ -54,13 +96,32 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+app.get("/login", (req, res) => {
+  res.render('login');
+});
+
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+   let emailAndPwMatched = false;
+   let userID = '';
+   for (var user in users) {
+     if ((users[user].email === req.body.email) && (users[user].password === req.body.password)) {
+      emailAndPwMatched = true;
+      userID = users[user].id;
+      }
+    }
+   if (!checkExistingEmail(req.body.email)) {
+    res.status(403).render('400');
+    console.log('email doesnt exist')
+  } else if (emailAndPwMatched) {
+    res.cookie('user_id', userID);
+    res.redirect('/urls');
+  } else {
+    res.status(403).render('400');
+  }
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
@@ -71,6 +132,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   let templateVars = {shortURL: req.params.id, longURL: req.body.longURL};
+  //TODO: update else/if statment to work
   if (templateVars) {
     urlDatabase[templateVars.shortURL] = templateVars.longURL;
     res.redirect(`/urls/${req.params.id}`);
@@ -80,8 +142,8 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  shortURL = generateRandomString();
-  longURL = req.body.longURL;
+  let shortURL = generateRandomString();
+  let longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect('http://localhost:8080/urls/' + shortURL)
 });
