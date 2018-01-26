@@ -35,6 +35,7 @@ const users = {
   }
 }
 
+//Loop through each email in users and check if it is the same as givin email
 function checkExistingEmail(email) {
   for (var userID in users) {
     if (users[userID].email === email) return true;
@@ -43,7 +44,7 @@ function checkExistingEmail(email) {
 }
 
 app.use(function(req, res, next) {
-  res.locals.username = req.cookies["username"] || false;
+  res.locals.user_id = req.cookies["user_id"] || false;
   next();
 });
 
@@ -62,8 +63,8 @@ app.post("/register", (req, res) => {
   if (!userVars.email || !userVars.password) {
     res.status(400).render('400');
   //if email sent = email in db set and render 400 status
-  } else if (checkExistingEmail(req.body.email)) {  // TODO: do something correct
-    res.status(400).render('400');
+  } else if (checkExistingEmail(req.body.email)) {
+    res.status(400).render('400'); // TODO: add res.cookie and set if cookie in register to display error
   } else {
     // insert userVars into database
     users[userID] = userVars;
@@ -95,13 +96,17 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+app.get("/login", (req, res) => {
+  res.render('login');
+});
+
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
+  res.cookie('user_id', req.body.user_id);
   res.redirect('/urls');
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
