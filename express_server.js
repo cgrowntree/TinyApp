@@ -25,7 +25,7 @@ var urlDatabase = {
 const users = { 
   "user1": {
     id: "user1", 
-    email: "user1@euser.com", 
+    email: "user1@user.com", 
     password: "user1"
   },
   "user2": {
@@ -33,6 +33,13 @@ const users = {
     email: "user2@user.com", 
     password: "user2"
   }
+}
+
+function checkExistingEmail(email) {
+  for (var userID in users) {
+    if (users[userID].email === email) return true;
+  }
+  return false;
 }
 
 app.use(function(req, res, next) {
@@ -49,10 +56,20 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  userID = generateRandomString();
-  let users = {id: userID, email: req.body.email, password: req.body.password};
-  res.cookie('user_id', userID);
-  res.redirect('/urls');
+  var userID = generateRandomString();
+  let userVars = {id: userID, email: req.body.email, password: req.body.password};
+  //if email or password is blank set and render 400 status
+  if (!userVars.email || !userVars.password) {
+    res.status(400).render('400');
+  //if email sent = email in db set and render 400 status
+  } else if (checkExistingEmail(req.body.email)) {  // TODO: do something correct
+    res.status(400).render('400');
+  } else {
+    // insert userVars into database
+    users[userID] = userVars;
+    res.cookie('user_id', userID);
+    res.redirect('/urls');
+  }
 });
 
 app.get("/urls.json", (req, res) => {
@@ -95,6 +112,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   let templateVars = {shortURL: req.params.id, longURL: req.body.longURL};
+  //TODO: update else/if statment to work
   if (templateVars) {
     urlDatabase[templateVars.shortURL] = templateVars.longURL;
     res.redirect(`/urls/${req.params.id}`);
@@ -104,8 +122,8 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  shortURL = generateRandomString();
-  longURL = req.body.longURL;
+  let shortURL = generateRandomString();
+  let longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect('http://localhost:8080/urls/' + shortURL)
 });
