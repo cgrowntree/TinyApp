@@ -4,6 +4,7 @@
   <head>
     <% include partials/_header %>
   </head>
+  <% if (user_id) { %>
   <body>
     <table>
       <% Object.keys(urls).forEach(function(key) { %>
@@ -16,4 +17,5 @@
       </table>
     <a href="/urls/new">Create new short URL here</a>
   </body>
+  <% } %>
 </html>
