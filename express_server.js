@@ -6,6 +6,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 var cookieParser = require('cookie-parser');
 app.use(cookieParser());
+const bcrypt = require('bcrypt');
 
 var urlDatabase = {
   "b2xVn2": {
@@ -106,7 +107,10 @@ app.get("/hello", (req, res) => {
 
 app.post("/register", (req, res) => {
   var userID = generateRandomString();
-  let userVars = {id: userID, email: req.body.email, password: req.body.password};
+  const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  let userVars = {id: userID, email: req.body.email, password: hashedPassword};
+  console.log(hashedPassword);
   //if email or password is blank set and render 400 status
   if (!userVars.email || !userVars.password) {
     res.status(400).render('400');
@@ -121,11 +125,13 @@ app.post("/register", (req, res) => {
   }
 });
 
+// users[user].password === req.body.password)
+
 app.post("/login", (req, res) => {
    let emailAndPwMatched = false;
    let userID = '';
    for (var user in users) {
-     if ((users[user].email === req.body.email) && (users[user].password === req.body.password)) {
+     if ((users[user].email === req.body.email) && (bcrypt.compareSync(req.body.password, users[user].password))) {
       emailAndPwMatched = true;
       userID = users[user].id;
       }
