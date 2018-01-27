@@ -4,16 +4,24 @@
   <head>
     <% include partials/_header %>
   </head>
+  <% if (user_id) { %>
   <body>
     <table>
-      <% Object.keys(urls).forEach(function(key) { %>
+      <% Object.keys(urls).forEach(function(id) { %>
+        <% var urlObj = urls[id] %>
         <tr>
-        <td><%= key %> → <%= urls[key] %></td>
-        <td><a href='/urls/<%= key %>'>Edit</a></td>
-          <td><form method="POST" action="/urls/<%= key %>/delete" style="display:inline-block"><button type='submit'>Delete 🗑 ️</button></form></td>
+        <td><%= urlObj.shortURL %> → <%= urlObj.longURL %></td>
+        <% if(urlObj.userID === user_id) { %>
+          <td><a href='/urls/<%= urlObj.shortURL %>'>Edit</a></td>
+          <td>
+            <form method="POST" action="/urls/<%= urlObj.shortURL %>/delete" style="display:inline-block"><button type='submit'>Delete 🗑 ️</button>
+            </form>
+          </td>
+        <% } %>
         </tr>
       <% }); %>
       </table>
     <a href="/urls/new">Create new short URL here</a>
   </body>
+  <% } %>
 </html>
