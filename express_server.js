@@ -171,9 +171,7 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   const UrlObj = urlDatabase[req.params.id];
   if(UrlObj.userID === req.cookies.user_id) {
-    console.log("Before", urlDatabase);
     delete urlDatabase[req.params.id];
-    console.log("After", urlDatabase);
     res.redirect('/urls');
   } else {
     res.status(403).send('You are not allowed! Go away.');
