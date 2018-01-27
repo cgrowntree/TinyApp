@@ -4,11 +4,12 @@
   <head>
     <% include partials/_header %>
   </head>
-  <% if (user_id) { %>
   <body>
     <ul>
-      <p>ShortURL: <strong><%= shortURL %></strong></p>
-      <form method="POST" action="/urls/<%= shortURL %>">
+      <p>ShortURL: <strong><%= urlObj.shortURL %></strong></p>
+      <p>LongURL: <strong><%= urlObj.longURL %></strong></p>
+      <% if (user_id) { %>
+      <form method="POST" action="/urls/<%= urlObj.shortURL %>">
         <label for="longURL"></label>
         <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 200px">
         <input type="submit" value="Update">
