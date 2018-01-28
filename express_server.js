@@ -1,7 +1,7 @@
 var express = require("express");
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
-var cookieSession = require('cookie-session')
+var cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");
@@ -17,7 +17,7 @@ app.use(cookieSession({
   keys: ['secretKey'],
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+}));
 
 app.use(function(req, res, next) {
   res.locals.user_id = req.session.user_id || false;
@@ -70,7 +70,7 @@ function checkExistingEmail(email) {
     if (users[userID].email === email) return true;
   }
   return false;
-}
+};
 
 //Loop through urlDatabase to check if given userID and shortURL match
 function checkUserOwnsUrl(userID, shortURL) {
@@ -78,7 +78,7 @@ function checkUserOwnsUrl(userID, shortURL) {
     if ((urlDatabase[id].userID === userID) && (urlDatabase[id].shortURL === shortURL)) return true;
   }
   return false;
-}
+};
 
 //Loop through userIDs to only show database which relates to specified user
 function urlsForUser(id) {
@@ -88,7 +88,7 @@ function urlsForUser(id) {
     if(longURL.userID === req.session.user_id);
   }
   return false;
-}
+};
 
 // function to authenticate the user
 function authenticateUser(email, password){
@@ -102,7 +102,7 @@ function authenticateUser(email, password){
     }
   }
   return userId;
-}
+};
 
 
 //GET REQUESTS=======================================================
@@ -248,7 +248,7 @@ app.post("/urls", (req, res) => {
       longURL: longURL,
       userID: userId
     };
-    res.redirect('/urls/' + shortURL)
+    res.redirect('/urls/' + shortURL);
   } else {
     res.status(400).send('Please login to access your urls.');
   }
