@@ -1,11 +1,13 @@
 var express = require("express");
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
+var cookieSession = require('cookie-session')
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-var cookieSession = require('cookie-session')
+
+//MIDDLEWEAR===============================================
 
 app.use(cookieSession({
   name: 'session',
@@ -20,7 +22,8 @@ app.use(function(req, res, next) {
 });
 
 
-//DATA FOR THE APP
+//DATABASE==================================================
+
 var urlDatabase = {
   "b2xVn2": {
     shortURL: "b2xVn2",
@@ -49,15 +52,13 @@ const users = {
 };
 
 
-// User defined functions ////
-// =============================
+// FUNCTIONS==============================================================
+
 function generateRandomString() {
   var output = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
   for (var i = 0; i < 6; i++)
   output += possible.charAt(Math.floor(Math.random() * possible.length));
-
   return output;
 };
 
@@ -92,7 +93,6 @@ function authenticateUser(email, password){
   var flag = false;
   var userId;
   for(var key in users){
-
     if((users[key].email===email) && (bcrypt.compareSync(password, users[key].password))){
       flag = true;
       userId = key;
@@ -102,7 +102,8 @@ function authenticateUser(email, password){
   return userId;
 }
 
-///=============== functions ends here
+
+//GET REQUESTS=======================================================
 
 app.get("/register", (req, res) => {
   let userId = req.session.user_id;
@@ -129,7 +130,7 @@ app.get("/urls", (req, res) => {
     let templateVars = {urls: urlDatabase, user: user};
     res.render("urls_index", templateVars);
   } else {
-    res.status(400).render('400');
+    res.status(400).send('Please login or register to view your urls.');
   }
 });
 
@@ -150,17 +151,16 @@ app.get("/urls/:id", (req, res) => {
   } else if(urlDatabase[req.params.id]) {
     res.redirect('/urls');
   } else {
-    res.status(400).render('400');
+    res.status(400).send('You may only edit your own urls. Check that the id is correct and try again.');
   }
 });
 
 app.get("/u/:id", (req, res) => {
-  if (urlDatabase[req.params.id]) {
-    let longURL = urlDatabase[req.params.id].longURL;
-    res.redirect(longURL);
-  } else {
-    res.status(400).render('400');
-  }
+    if (!urlDatabase[req.params.id]) {
+      res.status(400).send('The shortened url entered is incorrect.');
+    } else {
+      res.redirect(urlDatabase[req.params.id].longURL);
+    }
 });
 
 app.get("/urls.json", (req, res) => {
@@ -180,20 +180,20 @@ app.get("/", (req, res) => {
   }
 });
 
-// -----------------Post Requests ------------------------------------------
+
+//POST REQUESTS==============================================================
 
 app.post("/register", (req, res) => {
   var userID = generateRandomString();
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
   let userVars = {id: userID, email: req.body.email, password: hashedPassword};
-  console.log(hashedPassword);
   //if email or password is blank set and render 400 status
   if (!userVars.email || !userVars.password) {
-    res.status(400).render('400');
+    res.status(400).send('Please enter both an email and password to register.');
   //if email sent = email in db set and render 400 status
   } else if (checkExistingEmail(req.body.email)) {
-    res.status(400).render('400'); // TODO: add res.cookie and set if cookie in register to display error
+    res.status(400).send('A user with this email already exists.');
   } else {
     // insert userVars into database
     users[userID] = userVars;
@@ -211,17 +211,14 @@ app.post("/login", (req, res) => {
     //user is and password matched
     req.session.user_id = result;
     res.redirect('/urls');
-    console.log("user id and password matched");
   } else {
     //user id and password didnt match
-    res.status(403).render('400');
-    console.log("user id and password did not match");
+    res.status(403).send('Password or email address incorrect. Please try again');
   }
 });
 
 app.post("/logout", (req, res) => {
-  req.session = null;
-  // res.clearCookie('user_id');
+  req.session.user_id = null;
   res.redirect('/urls');
 });
 
@@ -235,22 +232,20 @@ app.post("/urls", (req, res) => {
       shortURL: shortURL,
       longURL: longURL,
       userID: userId
-      // userID: req.cookies.user_id
     };
-    res.redirect('http://localhost:8080/urls/' + shortURL)
+    res.redirect('/urls/' + shortURL)
   } else {
-    res.status(400).render('400');
+    res.status(400).send('Please login to access your urls.');
   }
 });
 
 app.post("/urls/:id", (req, res) => {
-  console.log("we are in the edit part");
   let userId = req.session.user_id;
   if(userId){
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect('/urls');
   } else {
-    res.send("you need to login first and then edit it");
+    res.status(400).send('Please login to edit your urls.');
   }
 });
 
@@ -260,10 +255,12 @@ app.post("/urls/:id/delete", (req, res) => {
     delete urlDatabase[req.params.id];
     res.redirect('/urls');
   } else {
-    res.status(403).send('You are not allowed! Go away.');
+    res.status(403).send('You may only delete your own urls.');
   }
 });
 
+
+//=================================================================
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
