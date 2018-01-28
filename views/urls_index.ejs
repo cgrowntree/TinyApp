@@ -1,27 +1,28 @@
 <!-- views/urls_index.ejs -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <% include partials/_header %>
-  </head>
-  <% if (user) { %>
-  <body>
-    <table>
-      <% Object.keys(urls).forEach(function(id) { %>
-        <% var urlObj = urls[id] %>
-        <tr>
-        <% if(urlObj.userID === user_id) { %>
-        <td><%= urlObj.shortURL %> → <%= urlObj.longURL %></td>
-          <td><a href='/urls/<%= urlObj.shortURL %>'>Edit</a></td>
-          <td>
-            <form method="POST" action="/urls/<%= urlObj.shortURL %>/delete" style="display:inline-block"><button type='submit'>Delete 🗑 ️</button>
-            </form>
-          </td>
-        <% } %>
-        </tr>
-      <% }); %>
-      </table>
-    <a href="/urls/new">Create new short URL here</a>
-  </body>
-  <% } %>
+<head>
+  <% include partials/_header %>
+</head><% if (user) { %>
+<body>
+  <table>
+    <% Object.keys(urls).forEach(function(id) { %><% var urlObj = urls[id] %>
+    <tr>
+      <% if(urlObj.userID === user_id) { %>
+      <td>
+        <a href='/u/<%= urlObj.shortURL %>'><%= urlObj.shortURL %></a> → <%= urlObj.longURL %>
+      </td>
+      <td>
+        <a href='/urls/<%= urlObj.shortURL %>'>Edit</a>
+      </td>
+      <td>
+        <form method="POST" action="/urls/<%= urlObj.shortURL %>/delete" style="display:inline-block">
+          <button type='submit'>Delete 🗑 ️</button>
+        </form>
+      </td><% } %>
+    </tr><% }); %>
+  </table><br>
+  </br>
+  <a href="/urls/new">Create new short URL here</a><% } %>
+</body>
 </html>

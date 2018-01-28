@@ -4,10 +4,13 @@ var PORT = process.env.PORT || 8080; // default port 8080
 var cookieSession = require('cookie-session')
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
-app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
 //MIDDLEWEAR===============================================
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 app.use(cookieSession({
   name: 'session',
@@ -57,8 +60,7 @@ const users = {
 function generateRandomString() {
   var output = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (var i = 0; i < 6; i++)
-  output += possible.charAt(Math.floor(Math.random() * possible.length));
+  for (var i = 0; i < 6; i++) output += possible.charAt(Math.floor(Math.random() * possible.length));
   return output;
 };
 
@@ -127,7 +129,10 @@ app.get("/urls", (req, res) => {
   let userId = req.session.user_id;
   let user = users[userId];
   if(userId) {
-    let templateVars = {urls: urlDatabase, user: user};
+    let templateVars = {
+      urls: urlDatabase,
+      user: user
+    };
     res.render("urls_index", templateVars);
   } else {
     res.status(400).send('Please login or register to view your urls.');
@@ -137,7 +142,10 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   let userId = req.session.user_id;
   let user = users[userId];
-  let templateVars = {urls: urlDatabase, user: user};
+  let templateVars = {
+    urls: urlDatabase,
+    user: user
+  };
   res.render("urls_new", templateVars);
 });
 
@@ -146,7 +154,10 @@ app.get("/urls/:id", (req, res) => {
   let userId = req.session.user_id;
   let user = users[userId];
   if(checkUserOwnsUrl(userId, shortURL)) {
-    let templateVars = {urlObj: urlDatabase[req.params.id], user: user};
+    let templateVars = {
+      urlObj: urlDatabase[req.params.id],
+      user: user
+    };
     res.render("urls_show", templateVars);
   } else if(urlDatabase[req.params.id]) {
     res.redirect('/urls');
@@ -187,7 +198,11 @@ app.post("/register", (req, res) => {
   var userID = generateRandomString();
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  let userVars = {id: userID, email: req.body.email, password: hashedPassword};
+  let userVars = {
+    id: userID,
+    email: req.body.email,
+    password: hashedPassword
+  };
   //if email or password is blank set and render 400 status
   if (!userVars.email || !userVars.password) {
     res.status(400).send('Please enter both an email and password to register.');

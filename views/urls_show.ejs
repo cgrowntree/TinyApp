@@ -1,22 +1,18 @@
 <!-- views/urls_show.ejs -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <% include partials/_header %>
-  </head>
-  <body>
-    <ul>
-      <p>ShortURL: <strong><%= urlObj.shortURL %></strong></p>
-      <p>LongURL: <strong><%= urlObj.longURL %></strong></p>
-      <% if (user) { %>
-      <form method="POST" action="/urls/<%= urlObj.shortURL %>">
-        <label for="longURL"></label>
-        <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 200px">
-        <input type="submit" value="Update">
-    </ul>
-  </body>
-  <% } else{ %>
-    <a href="/register">Register</a>
-    <a href="/login">Login</a>
-  <% } %>
+<head>
+  <% include partials/_header %>
+</head>
+<body>
+  <div style="margin-left: 2em">
+    <p>ShortURL: <strong><a href='/u/<%= urlObj.shortURL %>'><%= urlObj.shortURL %></a></strong></p>
+    <p>LongURL: <strong><%= urlObj.longURL %></strong></p><% if (user) { %>
+    <form method="POST" action="/urls/<%= urlObj.shortURL %>">
+      <label for="longURL"></label>
+      <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 200px">
+      <input type="submit" value="Update">
+    </form>
+  </div><% } else{ %><a href="/register">Register</a><a href="/login">Login</a><% } %>
+</body>
 </html>
